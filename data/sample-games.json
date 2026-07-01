@@ -1,0 +1,47 @@
+[
+  {
+    "title": "星露谷物語",
+    "platform": "PC",
+    "status": "遊玩中",
+    "memories": [
+      {
+        "name": "農場開局紀念",
+        "type": "text",
+        "text": "第一年春天開始整理農場。"
+      },
+      {
+        "name": "礦坑進度",
+        "type": "text",
+        "text": "第一次深入礦坑前的準備紀錄。"
+      }
+    ],
+    "notes": [
+      {
+        "title": "春季開局",
+        "content": "先擴充背包，再把每日體力用在耕種與釣魚。"
+      }
+    ],
+    "screenshots": [],
+    "updatedAt": "今天"
+  },
+  {
+    "title": "薩爾達傳說 王國之淚",
+    "platform": "Switch",
+    "status": "暫停",
+    "memories": [
+      {
+        "name": "地下探索",
+        "type": "text",
+        "text": "標記地下世界樹根與探索路線。"
+      }
+    ],
+    "notes": [
+      {
+        "title": "探索規則",
+        "content": "看到高塔先解鎖地圖，再沿路標記洞窟與神廟。"
+      }
+    ],
+    "screenshots": [],
+    "updatedAt": "昨天"
+  }
+]
