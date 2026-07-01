@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>遊戲筆記 | 我的遊戲庫</title>
+  <link rel="stylesheet" href="./css/styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="主要導覽">
+      <a class="brand" href="./index.html" aria-label="回到我的遊戲庫">
+        <span class="brand-mark">N</span>
+        <span>
+          <strong>遊戲筆記</strong>
+          <small>Game Notes Hub</small>
+        </span>
+      </a>
+
+      <nav class="nav-section" aria-label="主流程">
+        <a class="nav-link is-active" href="./index.html">
+          <span></span>
+          我的遊戲庫
+        </a>
+        <a class="nav-link" href="./settings.html">
+          <span></span>
+          設定
+        </a>
+      </nav>
+
+      <section class="status-card" aria-label="初始狀態">
+        <strong>初始狀態</strong>
+        <p>第一次進來不顯示任何範例內容，只提供新增入口。</p>
+      </section>
+    </aside>
+
+    <main class="content">
+      <header class="page-header">
+        <div>
+          <h1>我的遊戲庫</h1>
+        </div>
+        <label class="search-box">
+          <span class="sr-only">搜尋遊戲</span>
+          <input id="searchInput" type="search" placeholder="尚無遊戲可搜尋">
+        </label>
+      </header>
+
+      <section class="filter-row" aria-label="狀態篩選">
+        <div class="filter-group">
+          <button class="filter-pill is-active" type="button" data-filter="全部">全部</button>
+          <button class="filter-pill" type="button" data-filter="遊玩中">遊玩中</button>
+          <button class="filter-pill" type="button" data-filter="暫時退坑">暫時退坑</button>
+          <button class="filter-pill" type="button" data-filter="已退坑">已退坑</button>
+          <button class="filter-pill" type="button" data-filter="關望中">關望中</button>
+        </div>
+        <button class="button button-primary toolbar-add-button" type="button" id="toolbarAddButton">新增遊戲</button>
+      </section>
+
+      <section class="library-panel" aria-live="polite">
+        <div class="empty-state" id="emptyState">
+          <div class="empty-icon" aria-hidden="true">
+            <span></span>
+          </div>
+          <h2>還沒有遊戲筆記</h2>
+          <p>先新增一款遊戲，之後再進入該遊戲建立筆記、紀念圖片與影片。</p>
+          <div class="action-row">
+            <button class="button button-primary" type="button" id="addGameButton">新增第一款遊戲</button>
+            <button class="button button-secondary" type="button" id="loadDemoButton">匯入既有資料</button>
+          </div>
+        </div>
+
+        <div class="game-grid" id="gameGrid" hidden></div>
+      </section>
+
+    </main>
+
+    <aside class="summary" aria-label="遊戲庫摘要">
+      <section>
+        <h2>遊戲庫摘要</h2>
+        <div class="stat-grid">
+          <article class="stat-card">
+            <strong id="totalCount">0</strong>
+            <span>遊戲檔案</span>
+          </article>
+          <article class="stat-card">
+            <strong id="playingCount">0</strong>
+            <span>遊玩中</span>
+          </article>
+          <article class="stat-card">
+            <strong id="memoryCount">0</strong>
+            <span>紀念內容</span>
+          </article>
+          <article class="stat-card">
+            <strong id="noteCount">0</strong>
+            <span>收藏筆記</span>
+          </article>
+        </div>
+      </section>
+
+      <section>
+        <h2>最近開啟</h2>
+        <div class="recent-box" id="recentBox">
+          <strong>尚無最近開啟項目</strong>
+          <span>新增遊戲後會顯示在這裡</span>
+        </div>
+      </section>
+
+      <section class="account-panel">
+        <h2>帳號</h2>
+        <p id="userEmail">讀取登入狀態中</p>
+        <button class="button button-secondary" type="button" id="logoutButton">登出</button>
+      </section>
+
+    </aside>
+  </div>
+
+  <dialog class="modal" id="gameDialog">
+    <form method="dialog" class="modal-panel" id="gameForm">
+      <header>
+        <h2>新增遊戲</h2>
+        <button class="icon-button" value="cancel" aria-label="關閉">×</button>
+      </header>
+      <label>
+        遊戲名稱
+        <input name="title" required placeholder="例如：薩爾達傳說">
+      </label>
+      <label>
+        平台
+        <input name="platform" placeholder="例如：Switch / PC / PS5">
+      </label>
+      <label>
+        狀態
+        <select name="status">
+          <option>遊玩中</option>
+          <option>暫停</option>
+          <option>已完成</option>
+          <option>封存</option>
+        </select>
+      </label>
+      <label>
+        遊戲圖片（可選）
+        <span class="custom-file-picker">
+          <span class="custom-file-button">選擇檔案</span>
+          <span class="custom-file-name" id="coverFileName">請選取檔案</span>
+          <input name="coverFile" type="file" accept="image/*">
+        </span>
+      </label>
+      <footer>
+        <button class="button button-secondary" value="cancel" type="button" id="cancelDialogButton">取消</button>
+        <button class="button button-primary" value="default" type="submit">建立</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <script type="module" src="./js/theme.js"></script>
+  <script type="module" src="./js/app.js"></script>
+</body>
+</html>

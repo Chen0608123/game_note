@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>登入 | 遊戲筆記</title>
+  <link rel="stylesheet" href="./css/styles.css">
+</head>
+<body>
+  <main class="auth-page">
+    <section class="auth-panel">
+      <a class="brand auth-brand" href="./index.html" aria-label="回到遊戲筆記">
+        <span class="brand-mark">N</span>
+        <span>
+          <strong>遊戲筆記</strong>
+          <small>Game Notes Hub</small>
+        </span>
+      </a>
+
+      <form class="auth-form" id="authForm">
+        <h1 id="authTitle">登入遊戲筆記</h1>
+        <label>
+          Email
+          <input name="email" type="email" autocomplete="email" required placeholder="you@example.com">
+        </label>
+        <label>
+          密碼
+          <input name="password" type="password" autocomplete="current-password" required minlength="6" placeholder="至少 6 個字元">
+        </label>
+        <button class="button button-primary" type="submit" id="authSubmitButton">登入</button>
+        <button class="button button-secondary" type="button" id="authSwitchButton">還沒有帳號？建立一個</button>
+        <p class="auth-message" id="authMessage" aria-live="polite"></p>
+      </form>
+    </section>
+  </main>
+
+  <script type="module" src="./js/theme.js"></script>
+  <script type="module" src="./js/login.js"></script>
+</body>
+</html>
