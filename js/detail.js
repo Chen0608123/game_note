@@ -65,6 +65,89 @@ const elements = {
   logoutButton: document.querySelector("#logoutButton"),
 };
 
+function createIconCloseButton(label) {
+  const button = document.createElement("button");
+  button.className = "icon-button";
+  button.type = "button";
+  button.textContent = "x";
+  button.setAttribute("aria-label", label);
+  return button;
+}
+
+function createPanelActionButton(label) {
+  const button = document.createElement("button");
+  button.className = "button button-primary panel-action-button";
+  button.type = "button";
+  button.textContent = label;
+  return button;
+}
+
+function moveFormToDialog({
+  form,
+  title,
+  submitLabel,
+  cancelLabel,
+  closeLabel,
+}) {
+  const dialog = document.createElement("dialog");
+  dialog.className = "modal create-dialog";
+
+  const heading = form.closest(".workspace-panel")?.querySelector(".section-heading");
+  const openButton = createPanelActionButton(title);
+  heading?.insertAdjacentElement("afterend", openButton);
+
+  form.classList.remove("inline-form", "memory-upload-form");
+  form.classList.add("modal-panel", "create-modal-form");
+
+  const header = document.createElement("header");
+  const titleElement = document.createElement("h2");
+  const closeButton = createIconCloseButton(closeLabel);
+  titleElement.textContent = title;
+  header.append(titleElement, closeButton);
+  form.prepend(header);
+
+  const submitButton = form.querySelector("[type='submit']");
+  const footer = document.createElement("footer");
+  const cancelButton = document.createElement("button");
+  cancelButton.className = "button button-secondary";
+  cancelButton.type = "button";
+  cancelButton.textContent = cancelLabel;
+  submitButton.textContent = submitLabel;
+  footer.append(cancelButton, submitButton);
+  form.append(footer);
+
+  dialog.append(form);
+  document.body.append(dialog);
+
+  openButton.addEventListener("click", () => {
+    dialog.showModal();
+  });
+
+  [closeButton, cancelButton].forEach((button) => {
+    button.addEventListener("click", () => {
+      dialog.close();
+    });
+  });
+
+  return dialog;
+}
+
+elements.noteCreateDialog = moveFormToDialog({
+  form: elements.noteForm,
+  title: "新增筆記",
+  submitLabel: "新增筆記",
+  cancelLabel: "取消",
+  closeLabel: "關閉新增筆記",
+});
+
+elements.memoryCreateDialog = moveFormToDialog({
+  form: elements.memoryForm,
+  title: "新增紀念",
+  submitLabel: "上傳紀念",
+  cancelLabel: "取消",
+  closeLabel: "關閉新增紀念",
+});
+
 function setBusy(button, isBusy, label = "處理中") {
   if (!button) return;
   button.disabled = isBusy;
@@ -476,6 +559,7 @@ elements.noteForm.addEventListener("submit", async (event) => {
     });
     elements.noteForm.reset();
     updateNoteTypeFields();
+    elements.noteCreateDialog.close();
     await refresh();
   } catch (error) {
     showError(error);
@@ -510,6 +594,7 @@ elements.memoryForm.addEventListener("submit", async (event) => {
     });
     elements.memoryForm.reset();
     updateMemoryTypeFields();
+    elements.memoryCreateDialog.close();
     await refresh();
   } catch (error) {
     showError(error);
