@@ -890,6 +890,11 @@ h2 {
   gap: 10px;
 }
 
+.workspace-panel > #noteForm,
+.workspace-panel > #memoryForm {
+  display: none;
+}
+
 .section-search input {
   width: 100%;
   min-height: 44px;
@@ -1320,6 +1325,10 @@ h2 {
   box-shadow: var(--shadow);
 }
 
+.create-dialog {
+  width: min(640px, calc(100vw - 32px));
+}
+
 .modal::backdrop {
   background: rgba(23, 32, 38, 0.45);
 }
@@ -1356,6 +1365,19 @@ h2 {
 .modal-panel textarea {
   padding: 10px 12px;
   resize: vertical;
+}
+
+.create-modal-form .note-type-row label,
+.create-modal-form .file-picker {
+  display: flex;
+}
+
+.create-modal-form footer .button {
+  min-width: 180px;
+}
+
+.panel-action-button {
+  width: 100%;
 }
 
 .media-preview {
