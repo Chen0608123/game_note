@@ -273,6 +273,50 @@ button {
   color: #9aa7ae;
 }
 
+.nav-sub-toggle {
+  min-height: 34px;
+  padding: 0 14px 0 34px;
+  border: 0;
+  color: var(--muted);
+  background: transparent;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: left;
+}
+
+.nav-sub-toggle:hover,
+.nav-sub-toggle:focus-visible {
+  color: var(--text);
+}
+
+.sidebar-game-list {
+  display: grid;
+  gap: 6px;
+  padding: 0 0 4px 34px;
+}
+
+.sidebar-game-list a,
+.sidebar-game-list p {
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.45;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sidebar-game-list a {
+  padding: 5px 0;
+  text-decoration: none;
+}
+
+.sidebar-game-list a:hover,
+.sidebar-game-list a:focus-visible {
+  color: var(--accent);
+}
+
 .status-card,
 .notice-panel,
 .stat-card,

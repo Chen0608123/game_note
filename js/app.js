@@ -10,6 +10,8 @@
 import { requireUser, signOut } from "./auth.js";
 import { getGameSortMode } from "./preferences.js";
 
+const SIDEBAR_GAME_LIST_KEY = "game-note-sidebar-game-list-expanded";
+
 const titleCollator = new Intl.Collator("zh-Hant", {
   numeric: true,
   sensitivity: "base",
@@ -39,6 +41,7 @@ const state = {
   user: null,
   filter: "全部",
   search: "",
+  sidebarGameListExpanded: localStorage.getItem(SIDEBAR_GAME_LIST_KEY) === "true",
 };
 
 const elements = {
@@ -53,6 +56,8 @@ const elements = {
   memoryCount: document.querySelector("#memoryCount"),
   noteCount: document.querySelector("#noteCount"),
   recentBox: document.querySelector("#recentBox"),
+  gameListToggle: document.querySelector("#gameListToggle"),
+  gameNameList: document.querySelector("#gameNameList"),
   userEmail: document.querySelector("#userEmail"),
   logoutButton: document.querySelector("#logoutButton"),
   addButtons: [
@@ -132,6 +137,26 @@ function renderRecent() {
   `;
 }
 
+function renderSidebarGameList() {
+  if (!elements.gameListToggle || !elements.gameNameList) {
+    return;
+  }
+
+  const isExpanded = state.sidebarGameListExpanded;
+  elements.gameListToggle.setAttribute("aria-expanded", String(isExpanded));
+  elements.gameListToggle.textContent = isExpanded ? "收合遊戲清單" : "展開遊戲清單";
+  elements.gameNameList.hidden = !isExpanded;
+
+  if (!state.games.length) {
+    elements.gameNameList.innerHTML = `<p>尚無遊戲</p>`;
+    return;
+  }
+
+  elements.gameNameList.innerHTML = sortGames(state.games).map((game) => `
+    <a href="./game-detail.html?id=${encodeURIComponent(game.id)}">${escapeHtml(game.title)}</a>
+  `).join("");
+}
+
 function renderGames() {
   const visibleGames = getVisibleGames();
   const hasGames = state.games.length > 0;
@@ -181,6 +206,7 @@ function render() {
   renderAccount();
   renderStats();
   renderRecent();
+  renderSidebarGameList();
   renderGames();
 }
 
@@ -218,6 +244,12 @@ elements.loadDemoButton?.addEventListener("click", async (event) => {
   } finally {
     setBusy(event.currentTarget, false);
   }
+});
+
+elements.gameListToggle?.addEventListener("click", () => {
+  state.sidebarGameListExpanded = !state.sidebarGameListExpanded;
+  localStorage.setItem(SIDEBAR_GAME_LIST_KEY, String(state.sidebarGameListExpanded));
+  renderSidebarGameList();
 });
 
 elements.searchInput?.addEventListener("input", (event) => {
