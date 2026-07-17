@@ -1580,36 +1580,33 @@ h2 {
   cursor: zoom-in;
 }
 
-.media-preview-body.is-4x3-expanded,
-#notePreviewMedia.is-4x3-expanded {
+.media-preview-body.is-fullscreen-expanded,
+#notePreviewMedia.is-fullscreen-expanded {
   position: fixed;
-  top: 50%;
-  left: 50%;
+  inset: 0;
   z-index: 5;
-  width: min(100vw, calc(100vh * 4 / 3));
+  width: 100vw;
   max-width: none;
-  height: min(100vh, calc(100vw * 3 / 4));
-  aspect-ratio: 4 / 3;
-  margin: 0 auto;
-  transform: translate(-50%, -50%);
+  height: 100vh;
+  margin: 0;
+  transform: none;
   border: 0;
   border-radius: 0;
   background: #05080c;
   box-shadow: none;
 }
 
-.media-preview-body.is-4x3-expanded img,
-#notePreviewMedia.is-4x3-expanded img {
+.media-preview-body.is-fullscreen-expanded img,
+#notePreviewMedia.is-fullscreen-expanded img {
   width: 100%;
   height: 100%;
   max-height: none;
-  aspect-ratio: 4 / 3;
   object-fit: contain;
   cursor: zoom-out;
 }
 
-.media-preview-body.is-4x3-expanded::after,
-#notePreviewMedia.is-4x3-expanded::after {
+.media-preview-body.is-fullscreen-expanded::after,
+#notePreviewMedia.is-fullscreen-expanded::after {
   content: "再點一下圖片還原";
   position: absolute;
   right: 12px;
@@ -1884,12 +1881,6 @@ html[data-theme="dark"] .note-preview::backdrop {
   .note-preview-body {
     max-height: calc(100vh - 16px);
     padding: 28px 20px;
-  }
-
-  .media-preview-body.is-4x3-expanded,
-  #notePreviewMedia.is-4x3-expanded {
-    width: min(100vw, calc(100vh * 4 / 3));
-    height: min(100vh, calc(100vw * 3 / 4));
   }
 
   .setting-row {

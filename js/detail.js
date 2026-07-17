@@ -291,7 +291,7 @@ function openMediaPreview(memory) {
 function closeMediaPreview() {
   elements.mediaPreview.close();
   elements.mediaPreviewBody.innerHTML = "";
-  elements.mediaPreviewBody.classList.remove("is-4x3-expanded");
+  elements.mediaPreviewBody.classList.remove("is-fullscreen-expanded");
   elements.mediaPreview.classList.remove("is-image-fullscreen");
   elements.mediaPreviewDescription.textContent = "";
 }
@@ -314,7 +314,7 @@ function openNotePreview(note) {
 function closeNotePreview() {
   elements.notePreview.close();
   elements.notePreviewMedia.innerHTML = "";
-  elements.notePreviewMedia.classList.remove("is-4x3-expanded");
+  elements.notePreviewMedia.classList.remove("is-fullscreen-expanded");
   elements.notePreview.classList.remove("is-image-fullscreen");
 }
 
@@ -327,7 +327,7 @@ function togglePreviewImageRatio(container, event) {
 
   event.preventDefault();
   event.stopPropagation();
-  const isExpanded = container.classList.toggle("is-4x3-expanded");
+  const isExpanded = container.classList.toggle("is-fullscreen-expanded");
   container.closest("dialog")?.classList.toggle("is-image-fullscreen", isExpanded);
   image.setAttribute(
     "aria-label",
