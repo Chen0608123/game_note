@@ -934,8 +934,8 @@ h2 {
   gap: 10px;
 }
 
-.workspace-panel > #noteForm,
-.workspace-panel > #memoryForm {
+.workspace-panel>#noteForm,
+.workspace-panel>#memoryForm {
   display: none;
 }
 
@@ -1032,11 +1032,13 @@ h2 {
 
 .list-item {
   display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  position: relative;
   align-items: flex-start;
   justify-items: start;
   gap: 12px;
   min-height: 224px;
-  padding: 12px;
+  padding: 44px 12px 12px;
   border: 1px solid var(--line);
   border-radius: 6px;
   background: #f8faf9;
@@ -1044,6 +1046,7 @@ h2 {
 
 .note-preview-button {
   display: grid;
+  width: 100%;
   min-width: 0;
   min-height: 164px;
   align-content: start;
@@ -1078,7 +1081,7 @@ h2 {
 .note-preview-button img,
 .note-preview-button video {
   display: block;
-  width: min(220px, 100%);
+  width: min(280px, 100%);
   aspect-ratio: 16 / 9;
   object-fit: cover;
   border: 1px solid var(--line);
@@ -1098,7 +1101,7 @@ h2 {
   font-weight: 700;
 }
 
-.note-preview-button > span:not(.note-type-pill) {
+.note-preview-button>span:not(.note-type-pill) {
   width: fit-content;
   padding: 3px 8px;
   border-radius: 999px;
@@ -1138,7 +1141,7 @@ h2 {
   line-height: 1.6;
 }
 
-.list-item button,
+.list-item button:not(.pin-action),
 .item-actions button {
   border: 0;
   color: #8a4b43;
@@ -1151,14 +1154,67 @@ h2 {
   flex-wrap: wrap;
   gap: 8px;
   align-self: end;
+  justify-content: flex-start;
+  width: 100%;
+  margin-top: auto;
 }
 
 .item-actions button:first-child {
   color: var(--accent);
 }
 
-.item-actions button.is-pinned {
+.card-actions {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.list-item > .card-actions,
+.memory-card > .card-actions {
+  width: auto;
+  margin: 0;
+}
+
+.list-item > .item-actions,
+.memory-card-content > .item-actions {
+  position: static;
+  display: flex;
+  flex: 0 0 auto;
+  justify-content: flex-start;
+  width: fit-content;
+}
+
+.list-item > .item-actions button,
+.memory-card-content > .item-actions button {
+  width: auto;
+  min-width: 0;
+  padding: 0;
+}
+
+.pin-action {
+  display: inline-flex;
+  min-height: 34px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  border: 1px solid var(--line) !important;
+  border-radius: 999px;
+  color: var(--accent);
+  background: var(--field-bg) !important;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04) inset;
+  font-size: 16px;
   font-weight: 700;
+  line-height: 1;
+}
+
+.pin-action.is-pinned {
+  color: var(--button-text);
+  border-color: var(--accent);
+  background: var(--accent);
 }
 
 .task-item {
@@ -1187,8 +1243,9 @@ h2 {
 .screenshot-card,
 .memory-card {
   display: grid;
+  position: relative;
   gap: 6px;
-  padding: 0;
+  padding: 36px 0 0;
   border: 0;
   border-radius: 8px;
   background: transparent;
@@ -1230,11 +1287,15 @@ h2 {
 }
 
 .screenshot-card div,
-.memory-card div {
+.memory-card-content {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 8px;
   align-items: start;
+}
+
+.memory-card-content .item-actions {
+  grid-column: 1 / -1;
 }
 
 .memory-card strong {
@@ -1723,6 +1784,18 @@ html[data-theme="dark"] .filter-pill.is-active {
   color: var(--button-text);
   border-color: var(--accent-dark);
   background: var(--accent-dark);
+}
+
+html[data-theme="dark"] .pin-action {
+  color: var(--accent);
+  border-color: #344350 !important;
+  background: #101820 !important;
+}
+
+html[data-theme="dark"] .pin-action.is-pinned {
+  color: var(--button-text);
+  border-color: var(--accent) !important;
+  background: var(--accent) !important;
 }
 
 html[data-theme="dark"] .empty-icon,
