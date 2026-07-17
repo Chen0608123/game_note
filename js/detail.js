@@ -440,6 +440,45 @@ function setPinned(type, id, pinned) {
   localStorage.setItem(PINNED_ITEMS_KEY, JSON.stringify(pinnedItems));
 }
 
+function normalizePinnedItems(type, items) {
+  const pinnedItems = getPinnedItems();
+  const typePrefix = `${state.gameId}:${type}:`;
+  const itemIds = new Set(items.map((item) => item.id));
+  let latestPinnedKey = "";
+  let latestPinnedAt = 0;
+  let hasChanged = false;
+
+  Object.entries(pinnedItems).forEach(([pinnedKey, pinnedAt]) => {
+    if (!pinnedKey.startsWith(typePrefix)) {
+      return;
+    }
+
+    const itemId = pinnedKey.slice(typePrefix.length);
+
+    if (!itemIds.has(itemId)) {
+      delete pinnedItems[pinnedKey];
+      hasChanged = true;
+      return;
+    }
+
+    if (Number(pinnedAt) > latestPinnedAt) {
+      latestPinnedKey = pinnedKey;
+      latestPinnedAt = Number(pinnedAt);
+    }
+  });
+
+  Object.keys(pinnedItems).forEach((pinnedKey) => {
+    if (pinnedKey.startsWith(typePrefix) && pinnedKey !== latestPinnedKey) {
+      delete pinnedItems[pinnedKey];
+      hasChanged = true;
+    }
+  });
+
+  if (hasChanged) {
+    localStorage.setItem(PINNED_ITEMS_KEY, JSON.stringify(pinnedItems));
+  }
+}
+
 function sortPinnedFirst(items, type) {
   const pinnedItems = getPinnedItems();
 
@@ -491,6 +530,9 @@ function render() {
     : `<span>未上傳遊戲圖片</span>`;
   elements.noteSummary.textContent = `${game.notes.length} 筆`;
   elements.memorySummary.textContent = `${game.memories.length} 個紀念`;
+
+  normalizePinnedItems("note", game.notes);
+  normalizePinnedItems("memory", game.memories);
 
   const visibleNotes = getVisibleNotes(game.notes);
   const visibleMemories = getVisibleMemories(game.memories);

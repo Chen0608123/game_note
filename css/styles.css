@@ -1213,8 +1213,8 @@ h2 {
 
 .pin-action.is-pinned {
   color: var(--button-text);
-  border-color: var(--accent);
-  background: var(--accent);
+  border-color: var(--accent) !important;
+  background: var(--accent) !important;
 }
 
 .task-item {
