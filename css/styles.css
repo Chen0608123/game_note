@@ -1174,6 +1174,7 @@ h2 {
   gap: 8px;
   align-items: center;
   justify-content: flex-end;
+  max-width: calc(100% - 24px);
 }
 
 .card-actions button {
@@ -1183,6 +1184,14 @@ h2 {
 .card-actions button[data-edit-note],
 .card-actions button[data-edit-memory] {
   color: var(--accent);
+}
+
+.edit-delete-actions {
+  display: inline-flex;
+  flex: 0 0 auto;
+  gap: 18px;
+  align-items: center;
+  white-space: nowrap;
 }
 
 .pin-action {
