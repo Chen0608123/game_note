@@ -1033,11 +1033,12 @@ h2 {
 .list-item {
   display: grid;
   grid-template-rows: minmax(0, 1fr) auto;
+  position: relative;
   align-items: flex-start;
   justify-items: start;
   gap: 12px;
   min-height: 224px;
-  padding: 12px;
+  padding: 44px 12px 12px;
   border: 1px solid var(--line);
   border-radius: 6px;
   background: #f8faf9;
@@ -1140,7 +1141,7 @@ h2 {
   line-height: 1.6;
 }
 
-.list-item button,
+.list-item button:not(.pin-action),
 .item-actions button {
   border: 0;
   color: #8a4b43;
@@ -1162,19 +1163,21 @@ h2 {
   color: var(--accent);
 }
 
-.item-actions button.is-pinned {
-  font-weight: 700;
-}
-
-.item-actions .pin-action {
-  padding: 2px 8px;
+.pin-action {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 1;
+  padding: 4px 10px;
   border: 1px solid var(--line);
   border-radius: 999px;
   color: var(--accent);
   background: var(--field-bg);
+  font-size: 13px;
+  font-weight: 700;
 }
 
-.item-actions .pin-action.is-pinned {
+.pin-action.is-pinned {
   color: var(--button-text);
   border-color: var(--accent);
   background: var(--accent);
@@ -1206,8 +1209,9 @@ h2 {
 .screenshot-card,
 .memory-card {
   display: grid;
+  position: relative;
   gap: 6px;
-  padding: 0;
+  padding: 36px 0 0;
   border: 0;
   border-radius: 8px;
   background: transparent;
