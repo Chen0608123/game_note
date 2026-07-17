@@ -292,6 +292,7 @@ function closeMediaPreview() {
   elements.mediaPreview.close();
   elements.mediaPreviewBody.innerHTML = "";
   elements.mediaPreviewBody.classList.remove("is-4x3-expanded");
+  elements.mediaPreview.classList.remove("is-image-fullscreen");
   elements.mediaPreviewDescription.textContent = "";
 }
 
@@ -314,6 +315,7 @@ function closeNotePreview() {
   elements.notePreview.close();
   elements.notePreviewMedia.innerHTML = "";
   elements.notePreviewMedia.classList.remove("is-4x3-expanded");
+  elements.notePreview.classList.remove("is-image-fullscreen");
 }
 
 function togglePreviewImageRatio(container, event) {
@@ -325,10 +327,11 @@ function togglePreviewImageRatio(container, event) {
 
   event.preventDefault();
   event.stopPropagation();
-  container.classList.toggle("is-4x3-expanded");
+  const isExpanded = container.classList.toggle("is-4x3-expanded");
+  container.closest("dialog")?.classList.toggle("is-image-fullscreen", isExpanded);
   image.setAttribute(
     "aria-label",
-    container.classList.contains("is-4x3-expanded") ? "圖片已放大，點擊還原" : "點擊圖片放大"
+    isExpanded ? "圖片已全畫面放大，點擊還原" : "點擊圖片放大"
   );
 }
 
