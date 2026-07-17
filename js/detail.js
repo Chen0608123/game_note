@@ -502,7 +502,7 @@ function render() {
         ${renderNoteMedia(note)}
       </button>
       <div class="item-actions">
-        <button type="button" class="${isPinned("note", note.id) ? "is-pinned" : ""}" data-pin-note="${escapeHtml(note.id)}">${isPinned("note", note.id) ? "取消置頂" : "置頂"}</button>
+        <button type="button" class="pin-action ${isPinned("note", note.id) ? "is-pinned" : ""}" data-pin-note="${escapeHtml(note.id)}">${isPinned("note", note.id) ? "取消置頂" : "置頂"}</button>
         <button type="button" data-edit-note="${escapeHtml(note.id)}">編輯</button>
         <button type="button" data-delete-note="${escapeHtml(note.id)}">刪除</button>
       </div>
@@ -516,7 +516,7 @@ function render() {
         <strong>${escapeHtml(memory.name)}</strong>
         ${memory.description ? `<p>${escapeHtml(memory.description)}</p>` : ""}
         <div class="item-actions">
-          <button type="button" class="${isPinned("memory", memory.id) ? "is-pinned" : ""}" data-pin-memory="${escapeHtml(memory.id)}">${isPinned("memory", memory.id) ? "取消置頂" : "置頂"}</button>
+          <button type="button" class="pin-action ${isPinned("memory", memory.id) ? "is-pinned" : ""}" data-pin-memory="${escapeHtml(memory.id)}">${isPinned("memory", memory.id) ? "取消置頂" : "置頂"}</button>
           <button type="button" data-edit-memory="${escapeHtml(memory.id)}">編輯</button>
           <button type="button" data-delete-memory="${escapeHtml(memory.id)}">刪除</button>
         </div>

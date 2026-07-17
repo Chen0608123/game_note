@@ -1032,6 +1032,7 @@ h2 {
 
 .list-item {
   display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
   align-items: flex-start;
   justify-items: start;
   gap: 12px;
@@ -1044,6 +1045,7 @@ h2 {
 
 .note-preview-button {
   display: grid;
+  width: 100%;
   min-width: 0;
   min-height: 164px;
   align-content: start;
@@ -1151,6 +1153,9 @@ h2 {
   flex-wrap: wrap;
   gap: 8px;
   align-self: end;
+  justify-content: flex-start;
+  width: 100%;
+  margin-top: auto;
 }
 
 .item-actions button:first-child {
@@ -1159,6 +1164,20 @@ h2 {
 
 .item-actions button.is-pinned {
   font-weight: 700;
+}
+
+.item-actions .pin-action {
+  padding: 2px 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--accent);
+  background: var(--field-bg);
+}
+
+.item-actions .pin-action.is-pinned {
+  color: var(--button-text);
+  border-color: var(--accent);
+  background: var(--accent);
 }
 
 .task-item {
@@ -1235,6 +1254,10 @@ h2 {
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 8px;
   align-items: start;
+}
+
+.memory-card .item-actions {
+  grid-column: 1 / -1;
 }
 
 .memory-card strong {
