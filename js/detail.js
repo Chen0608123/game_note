@@ -326,6 +326,10 @@ function togglePreviewImageRatio(container, event) {
   event.preventDefault();
   event.stopPropagation();
   container.classList.toggle("is-4x3-expanded");
+  image.setAttribute(
+    "aria-label",
+    container.classList.contains("is-4x3-expanded") ? "圖片已放大，點擊還原" : "點擊圖片放大"
+  );
 }
 
 function openNoteEdit(note) {
