@@ -1173,6 +1173,20 @@ h2 {
   justify-content: flex-end;
 }
 
+.list-item > .card-actions,
+.memory-card > .card-actions {
+  width: auto;
+  margin: 0;
+}
+
+.list-item > .item-actions,
+.memory-card-content > .item-actions {
+  position: static;
+  display: flex;
+  justify-content: flex-start;
+  width: 100%;
+}
+
 .pin-action {
   padding: 4px 10px;
   border: 1px solid var(--line);
@@ -1258,14 +1272,14 @@ h2 {
 }
 
 .screenshot-card div,
-.memory-card div {
+.memory-card-content {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 8px;
   align-items: start;
 }
 
-.memory-card .item-actions {
+.memory-card-content .item-actions {
   grid-column: 1 / -1;
 }
 

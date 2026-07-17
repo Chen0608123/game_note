@@ -517,7 +517,7 @@ function render() {
         <button type="button" class="pin-action ${isPinned("memory", memory.id) ? "is-pinned" : ""}" data-pin-memory="${escapeHtml(memory.id)}">${isPinned("memory", memory.id) ? "已置頂" : "置頂"}</button>
       </div>
       ${renderMedia(memory)}
-      <div>
+      <div class="memory-card-content">
         <strong>${escapeHtml(memory.name)}</strong>
         ${memory.description ? `<p>${escapeHtml(memory.description)}</p>` : ""}
         <div class="item-actions">
