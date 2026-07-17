@@ -934,8 +934,8 @@ h2 {
   gap: 10px;
 }
 
-.workspace-panel > #noteForm,
-.workspace-panel > #memoryForm {
+.workspace-panel>#noteForm,
+.workspace-panel>#memoryForm {
   display: none;
 }
 
@@ -1101,7 +1101,7 @@ h2 {
   font-weight: 700;
 }
 
-.note-preview-button > span:not(.note-type-pill) {
+.note-preview-button>span:not(.note-type-pill) {
   width: fit-content;
   padding: 3px 8px;
   border-radius: 999px;
