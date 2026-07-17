@@ -291,6 +291,7 @@ function openMediaPreview(memory) {
 function closeMediaPreview() {
   elements.mediaPreview.close();
   elements.mediaPreviewBody.innerHTML = "";
+  elements.mediaPreviewBody.classList.remove("is-4x3-expanded");
   elements.mediaPreviewDescription.textContent = "";
 }
 
@@ -312,6 +313,19 @@ function openNotePreview(note) {
 function closeNotePreview() {
   elements.notePreview.close();
   elements.notePreviewMedia.innerHTML = "";
+  elements.notePreviewMedia.classList.remove("is-4x3-expanded");
+}
+
+function togglePreviewImageRatio(container, event) {
+  const image = event.target.closest("img");
+
+  if (!image || !container.contains(image)) {
+    return;
+  }
+
+  event.preventDefault();
+  event.stopPropagation();
+  container.classList.toggle("is-4x3-expanded");
 }
 
 function openNoteEdit(note) {
@@ -712,12 +726,20 @@ elements.mediaPreview.addEventListener("click", (event) => {
   }
 });
 
+elements.mediaPreviewBody.addEventListener("click", (event) => {
+  togglePreviewImageRatio(elements.mediaPreviewBody, event);
+});
+
 elements.notePreviewClose.addEventListener("click", closeNotePreview);
 
 elements.notePreview.addEventListener("click", (event) => {
   if (event.target === elements.notePreview) {
     closeNotePreview();
   }
+});
+
+elements.notePreviewMedia.addEventListener("click", (event) => {
+  togglePreviewImageRatio(elements.notePreviewMedia, event);
 });
 
 elements.noteEditCancelButton.addEventListener("click", closeNoteEdit);
