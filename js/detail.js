@@ -424,8 +424,14 @@ function isPinned(type, id) {
 function setPinned(type, id, pinned) {
   const pinnedItems = getPinnedItems();
   const key = getPinnedKey(type, id);
+  const typePrefix = `${state.gameId}:${type}:`;
 
   if (pinned) {
+    Object.keys(pinnedItems).forEach((pinnedKey) => {
+      if (pinnedKey.startsWith(typePrefix)) {
+        delete pinnedItems[pinnedKey];
+      }
+    });
     pinnedItems[key] = Date.now();
   } else {
     delete pinnedItems[key];
