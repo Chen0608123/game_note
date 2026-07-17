@@ -1157,6 +1157,10 @@ h2 {
   color: var(--accent);
 }
 
+.item-actions button.is-pinned {
+  font-weight: 700;
+}
+
 .task-item {
   align-items: center;
 }

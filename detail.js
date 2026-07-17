@@ -21,6 +21,8 @@ const state = {
   memorySearch: "",
 };
 
+const PINNED_ITEMS_KEY = "game-note-pinned-items";
+
 const elements = {
   detailPage: document.querySelector("#detailPage"),
   notFoundPanel: document.querySelector("#notFoundPanel"),
@@ -403,21 +405,65 @@ function matchesKeyword(parts, keyword) {
     .includes(normalizedKeyword);
 }
 
+function getPinnedItems() {
+  try {
+    return JSON.parse(localStorage.getItem(PINNED_ITEMS_KEY)) || {};
+  } catch {
+    return {};
+  }
+}
+
+function getPinnedKey(type, id) {
+  return `${state.gameId}:${type}:${id}`;
+}
+
+function isPinned(type, id) {
+  return Boolean(getPinnedItems()[getPinnedKey(type, id)]);
+}
+
+function setPinned(type, id, pinned) {
+  const pinnedItems = getPinnedItems();
+  const key = getPinnedKey(type, id);
+
+  if (pinned) {
+    pinnedItems[key] = Date.now();
+  } else {
+    delete pinnedItems[key];
+  }
+
+  localStorage.setItem(PINNED_ITEMS_KEY, JSON.stringify(pinnedItems));
+}
+
+function sortPinnedFirst(items, type) {
+  const pinnedItems = getPinnedItems();
+
+  return [...items].sort((a, b) => {
+    const aPinnedAt = pinnedItems[getPinnedKey(type, a.id)] || 0;
+    const bPinnedAt = pinnedItems[getPinnedKey(type, b.id)] || 0;
+
+    if (aPinnedAt || bPinnedAt) {
+      return bPinnedAt - aPinnedAt;
+    }
+
+    return new Date(b.created_at || 0) - new Date(a.created_at || 0);
+  });
+}
+
 function getVisibleNotes(notes) {
-  return notes.filter((note) => matchesKeyword([
+  return sortPinnedFirst(notes.filter((note) => matchesKeyword([
     note.title,
     note.content,
     getNoteTypeLabel(note.note_type),
-  ], state.noteSearch));
+  ], state.noteSearch)), "note");
 }
 
 function getVisibleMemories(memories) {
-  return memories.filter((memory) => matchesKeyword([
+  return sortPinnedFirst(memories.filter((memory) => matchesKeyword([
     memory.name,
     memory.description,
     memory.media_type,
     memory.public_url,
-  ], state.memorySearch));
+  ], state.memorySearch)), "memory");
 }
 
 function render() {
@@ -456,6 +502,7 @@ function render() {
         ${renderNoteMedia(note)}
       </button>
       <div class="item-actions">
+        <button type="button" class="${isPinned("note", note.id) ? "is-pinned" : ""}" data-pin-note="${escapeHtml(note.id)}">${isPinned("note", note.id) ? "取消置頂" : "置頂"}</button>
         <button type="button" data-edit-note="${escapeHtml(note.id)}">編輯</button>
         <button type="button" data-delete-note="${escapeHtml(note.id)}">刪除</button>
       </div>
@@ -469,6 +516,7 @@ function render() {
         <strong>${escapeHtml(memory.name)}</strong>
         ${memory.description ? `<p>${escapeHtml(memory.description)}</p>` : ""}
         <div class="item-actions">
+          <button type="button" class="${isPinned("memory", memory.id) ? "is-pinned" : ""}" data-pin-memory="${escapeHtml(memory.id)}">${isPinned("memory", memory.id) ? "取消置頂" : "置頂"}</button>
           <button type="button" data-edit-memory="${escapeHtml(memory.id)}">編輯</button>
           <button type="button" data-delete-memory="${escapeHtml(memory.id)}">刪除</button>
         </div>
@@ -707,10 +755,24 @@ document.addEventListener("click", async (event) => {
   const memoryId = event.target.dataset.deleteMemory;
   const editNoteId = event.target.dataset.editNote;
   const editMemoryId = event.target.dataset.editMemory;
+  const pinNoteId = event.target.dataset.pinNote;
+  const pinMemoryId = event.target.dataset.pinMemory;
   const notePreviewId = event.target.closest("[data-preview-note]")?.dataset.previewNote;
   const previewId = event.target.closest("[data-preview-memory]")?.dataset.previewMemory;
 
   try {
+    if (pinNoteId) {
+      setPinned("note", pinNoteId, !isPinned("note", pinNoteId));
+      render();
+      return;
+    }
+
+    if (pinMemoryId) {
+      setPinned("memory", pinMemoryId, !isPinned("memory", pinMemoryId));
+      render();
+      return;
+    }
+
     if (editNoteId) {
       const note = state.game.notes.find((item) => item.id === editNoteId);
       if (note) openNoteEdit(note);
