@@ -497,8 +497,6 @@ function render() {
     <article class="list-item">
       <div class="card-actions">
         <button type="button" class="pin-action ${isPinned("note", note.id) ? "is-pinned" : ""}" data-pin-note="${escapeHtml(note.id)}">${isPinned("note", note.id) ? "已置頂" : "置頂"}</button>
-        <button type="button" data-edit-note="${escapeHtml(note.id)}">編輯</button>
-        <button type="button" data-delete-note="${escapeHtml(note.id)}">刪除</button>
       </div>
       <button class="note-preview-button" type="button" data-preview-note="${escapeHtml(note.id)}">
         <span class="note-type-pill">${getNoteTypeLabel(note.note_type)}</span>
@@ -506,6 +504,10 @@ function render() {
         <p>${escapeHtml(note.content || "尚未填寫內容")}</p>
         ${renderNoteMedia(note)}
       </button>
+      <div class="item-actions">
+        <button type="button" data-edit-note="${escapeHtml(note.id)}">編輯</button>
+        <button type="button" data-delete-note="${escapeHtml(note.id)}">刪除</button>
+      </div>
     </article>
   `).join("") : `<p class="empty-copy">${game.notes.length ? "找不到符合搜尋的筆記。" : "目前沒有筆記。"}</p>`;
 
@@ -513,13 +515,15 @@ function render() {
     <article class="memory-card">
       <div class="card-actions">
         <button type="button" class="pin-action ${isPinned("memory", memory.id) ? "is-pinned" : ""}" data-pin-memory="${escapeHtml(memory.id)}">${isPinned("memory", memory.id) ? "已置頂" : "置頂"}</button>
-        <button type="button" data-edit-memory="${escapeHtml(memory.id)}">編輯</button>
-        <button type="button" data-delete-memory="${escapeHtml(memory.id)}">刪除</button>
       </div>
       ${renderMedia(memory)}
       <div>
         <strong>${escapeHtml(memory.name)}</strong>
         ${memory.description ? `<p>${escapeHtml(memory.description)}</p>` : ""}
+        <div class="item-actions">
+          <button type="button" data-edit-memory="${escapeHtml(memory.id)}">編輯</button>
+          <button type="button" data-delete-memory="${escapeHtml(memory.id)}">刪除</button>
+        </div>
       </div>
     </article>
   `).join("") : `<p class="empty-copy">${game.memories.length ? "找不到符合搜尋的紀念。" : "目前沒有已上傳紀念。"}</p>`;
