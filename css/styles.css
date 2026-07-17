@@ -1142,7 +1142,8 @@ h2 {
 }
 
 .list-item button:not(.pin-action),
-.item-actions button {
+.item-actions button,
+.card-actions button:not(.pin-action) {
   border: 0;
   color: #8a4b43;
   background: transparent;
@@ -1163,17 +1164,33 @@ h2 {
   color: var(--accent);
 }
 
-.pin-action {
+.card-actions {
   position: absolute;
   top: 12px;
   right: 12px;
   z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.card-actions button {
+  font-size: 13px;
+}
+
+.card-actions button[data-edit-note],
+.card-actions button[data-edit-memory] {
+  color: var(--accent);
+}
+
+.pin-action {
   padding: 4px 10px;
   border: 1px solid var(--line);
   border-radius: 999px;
   color: var(--accent);
   background: var(--field-bg);
-  font-size: 13px;
   font-weight: 700;
 }
 
