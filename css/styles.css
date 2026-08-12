@@ -253,10 +253,11 @@ button {
 }
 
 .nav-link span {
-  width: 11px;
-  height: 11px;
-  border-radius: 50%;
-  background: #aebbc2;
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  border-radius: 0;
+  background: url("../standby.png") center / contain no-repeat;
 }
 
 .nav-link.is-active {
@@ -266,7 +267,7 @@ button {
 }
 
 .nav-link.is-active span {
-  background: #fff;
+  background: url("../watch.png") center / contain no-repeat;
 }
 
 .nav-link.is-muted {
