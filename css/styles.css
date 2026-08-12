@@ -212,10 +212,12 @@ button {
   width: 44px;
   height: 44px;
   place-items: center;
-  border: 2px solid var(--text);
+  border: 0;
   border-radius: 4px;
-  font-size: 24px;
-  font-weight: 800;
+  background: url("../usepng/logo.png") center / contain no-repeat;
+  color: transparent;
+  font-size: 0;
+  font-weight: 0;
 }
 
 .brand strong,
