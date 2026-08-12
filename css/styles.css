@@ -1211,6 +1211,14 @@ h2 {
   outline-offset: 3px;
 }
 
+.item-delete-button {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 4;
+  cursor: pointer;
+}
+
 .pin-action {
   display: inline-flex;
   min-height: 34px;

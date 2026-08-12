@@ -543,6 +543,7 @@ function render() {
 
   elements.noteList.innerHTML = visibleNotes.length ? visibleNotes.map((note) => `
     <article class="list-item">
+      <button class="icon-delete-button item-delete-button" type="button" data-delete-note="${escapeHtml(note.id)}" aria-label="刪除筆記"></button>
       <div class="card-actions">
         <button type="button" class="pin-action ${isPinned("note", note.id) ? "is-pinned" : ""}" data-pin-note="${escapeHtml(note.id)}">${isPinned("note", note.id) ? "已置頂" : "置頂"}</button>
       </div>
@@ -554,13 +555,13 @@ function render() {
       </button>
       <div class="item-actions">
         <button type="button" data-edit-note="${escapeHtml(note.id)}">編輯</button>
-        <button class="icon-delete-button" type="button" data-delete-note="${escapeHtml(note.id)}" aria-label="刪除筆記"></button>
       </div>
     </article>
   `).join("") : `<p class="empty-copy">${game.notes.length ? "找不到符合搜尋的筆記。" : "目前沒有筆記。"}</p>`;
 
   elements.memoryList.innerHTML = visibleMemories.length ? visibleMemories.map((memory) => `
     <article class="memory-card">
+      <button class="icon-delete-button item-delete-button" type="button" data-delete-memory="${escapeHtml(memory.id)}" aria-label="刪除紀念"></button>
       <div class="card-actions">
         <button type="button" class="pin-action ${isPinned("memory", memory.id) ? "is-pinned" : ""}" data-pin-memory="${escapeHtml(memory.id)}">${isPinned("memory", memory.id) ? "已置頂" : "置頂"}</button>
       </div>
@@ -570,7 +571,6 @@ function render() {
         ${memory.description ? `<p>${escapeHtml(memory.description)}</p>` : ""}
         <div class="item-actions">
           <button type="button" data-edit-memory="${escapeHtml(memory.id)}">編輯</button>
-          <button class="icon-delete-button" type="button" data-delete-memory="${escapeHtml(memory.id)}" aria-label="刪除紀念"></button>
         </div>
       </div>
     </article>
