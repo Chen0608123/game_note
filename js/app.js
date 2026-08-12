@@ -184,7 +184,7 @@ function renderGames() {
 
   elements.gameGrid.innerHTML = visibleGames.map((game) => `
     <article class="game-card" data-detail-url="./game-detail.html?id=${encodeURIComponent(game.id)}" tabindex="0" role="link" aria-label="查看 ${escapeHtml(game.title)} 詳情">
-      <button class="game-card-delete" type="button" data-delete-game-id="${escapeHtml(game.id)}">刪除</button>
+      <button class="icon-delete-button game-card-delete" type="button" data-delete-game-id="${escapeHtml(game.id)}" aria-label="刪除 ${escapeHtml(game.title)}"></button>
       <div class="game-card-cover ${game.cover_url ? "" : "is-empty"}">
         ${game.cover_url ? `<img src="${escapeHtml(game.cover_url)}" alt="${escapeHtml(game.title)}">` : `<span>未上傳圖片</span>`}
       </div>

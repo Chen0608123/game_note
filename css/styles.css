@@ -257,7 +257,7 @@ button {
   width: 18px;
   height: 18px;
   border-radius: 0;
-  background: url("../standby.png") center / contain no-repeat;
+  background: url("../usepng/standby.png") center / contain no-repeat;
 }
 
 .nav-link.is-active {
@@ -267,7 +267,7 @@ button {
 }
 
 .nav-link.is-active span {
-  background: url("../watch.png") center / contain no-repeat;
+  background: url("../usepng/watch.png") center / contain no-repeat;
 }
 
 .nav-link.is-muted {
@@ -526,21 +526,12 @@ h2 {
   top: 14px;
   left: 14px;
   z-index: 1;
-  min-height: 30px;
-  padding: 0 10px;
-  border: 1px solid #e4c7c2;
-  border-radius: 999px;
-  color: #8a4b43;
-  background: #fff7f5;
-  font-size: 13px;
-  font-weight: 700;
+  padding: 0;
 }
 
 .game-card-delete:hover,
 .game-card-delete:focus-visible {
-  color: #fff;
-  border-color: #8a4b43;
-  background: #8a4b43;
+  transform: translateY(-1px);
 }
 
 .game-card-cover {
@@ -1196,6 +1187,28 @@ h2 {
   padding: 0;
 }
 
+.icon-delete-button {
+  display: inline-flex;
+  width: 26px;
+  height: 26px;
+  min-width: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: url("../usepng/del.png") center / contain no-repeat;
+  color: transparent;
+  font-size: 0;
+  line-height: 0;
+  vertical-align: middle;
+}
+
+.icon-delete-button:hover,
+.icon-delete-button:focus-visible {
+  transform: translateY(-1px);
+  outline: 1px solid var(--danger);
+  outline-offset: 3px;
+}
+
 .pin-action {
   display: inline-flex;
   min-height: 34px;
@@ -1751,7 +1764,6 @@ html[data-theme="dark"] textarea::placeholder {
 
 html[data-theme="dark"] .button-secondary,
 html[data-theme="dark"] .button-danger,
-html[data-theme="dark"] .game-card-delete,
 html[data-theme="dark"] .filter-pill,
 html[data-theme="dark"] .custom-file-picker,
 html[data-theme="dark"] .file-picker,
@@ -1772,12 +1784,16 @@ html[data-theme="dark"] .button-danger {
   color: #ffb4a9;
 }
 
+html[data-theme="dark"] .icon-delete-button {
+  background: url("../usepng/del.png") center / contain no-repeat;
+}
+
 html[data-theme="dark"] .button-danger:hover,
-html[data-theme="dark"] .game-card-delete:hover,
-html[data-theme="dark"] .game-card-delete:focus-visible {
+html[data-theme="dark"] .icon-delete-button:hover,
+html[data-theme="dark"] .icon-delete-button:focus-visible {
   color: #120f0e;
-  border-color: #ffb4a9;
-  background: #ffb4a9;
+  border-color: transparent;
+  background: url("../usepng/del.png") center / contain no-repeat;
 }
 
 html[data-theme="dark"] .button-primary,

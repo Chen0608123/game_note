@@ -554,7 +554,7 @@ function render() {
       </button>
       <div class="item-actions">
         <button type="button" data-edit-note="${escapeHtml(note.id)}">編輯</button>
-        <button type="button" data-delete-note="${escapeHtml(note.id)}">刪除</button>
+        <button class="icon-delete-button" type="button" data-delete-note="${escapeHtml(note.id)}" aria-label="刪除筆記"></button>
       </div>
     </article>
   `).join("") : `<p class="empty-copy">${game.notes.length ? "找不到符合搜尋的筆記。" : "目前沒有筆記。"}</p>`;
@@ -570,7 +570,7 @@ function render() {
         ${memory.description ? `<p>${escapeHtml(memory.description)}</p>` : ""}
         <div class="item-actions">
           <button type="button" data-edit-memory="${escapeHtml(memory.id)}">編輯</button>
-          <button type="button" data-delete-memory="${escapeHtml(memory.id)}">刪除</button>
+          <button class="icon-delete-button" type="button" data-delete-memory="${escapeHtml(memory.id)}" aria-label="刪除紀念"></button>
         </div>
       </div>
     </article>
