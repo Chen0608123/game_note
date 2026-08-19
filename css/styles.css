@@ -296,14 +296,8 @@ button {
   height: 30px;
   border-radius: 999px;
   background-color: rgba(255, 255, 255, 0.92);
-  background-image: url("../usepng/OFF.png");
-  background-position: center;
-  background-size: 18px 18px;
-  background-repeat: no-repeat;
-}
-
-.nav-sub-toggle[aria-expanded="true"] .nav-sub-toggle-icon {
-  background-image: url("../usepng/ON.png");
+  object-fit: contain;
+  padding: 6px;
 }
 
 .nav-sub-toggle:hover,
