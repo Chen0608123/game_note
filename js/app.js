@@ -144,7 +144,11 @@ function renderSidebarGameList() {
 
   const isExpanded = state.sidebarGameListExpanded;
   elements.gameListToggle.setAttribute("aria-expanded", String(isExpanded));
-  elements.gameListToggle.textContent = isExpanded ? "收合遊戲清單" : "展開遊戲清單";
+  elements.gameListToggle.setAttribute("aria-label", isExpanded ? "收合遊戲清單" : "展開遊戲清單");
+  elements.gameListToggle.innerHTML = `
+    <span class="nav-sub-toggle-icon" aria-hidden="true"></span>
+    <span class="sr-only">${isExpanded ? "收合遊戲清單" : "展開遊戲清單"}</span>
+  `;
   elements.gameNameList.hidden = !isExpanded;
 
   if (!state.games.length) {

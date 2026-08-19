@@ -277,7 +277,10 @@ button {
 }
 
 .nav-sub-toggle {
+  display: inline-flex;
   min-height: 34px;
+  align-items: center;
+  justify-content: flex-start;
   padding: 0 14px 0 34px;
   border: 0;
   color: var(--muted);
@@ -285,6 +288,17 @@ button {
   font-size: 14px;
   font-weight: 700;
   text-align: left;
+}
+
+.nav-sub-toggle-icon {
+  display: block;
+  width: 22px;
+  height: 22px;
+  background: url("../usepng/OFF.png") center / contain no-repeat;
+}
+
+.nav-sub-toggle[aria-expanded="true"] .nav-sub-toggle-icon {
+  background-image: url("../usepng/ON.png");
 }
 
 .nav-sub-toggle:hover,
