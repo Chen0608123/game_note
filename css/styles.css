@@ -292,12 +292,9 @@ button {
 
 .nav-sub-toggle-icon {
   display: block;
-  width: 30px;
-  height: 30px;
-  border-radius: 999px;
-  background-color: rgba(255, 255, 255, 0.92);
+  width: 22px;
+  height: 22px;
   object-fit: contain;
-  padding: 6px;
 }
 
 .nav-sub-toggle:hover,
