@@ -737,6 +737,19 @@ h2 {
   white-space: nowrap;
 }
 
+.auto-cover-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.auto-cover-row .button {
+  min-height: 40px;
+  padding: 0 16px;
+}
+
 .game-edit-form input,
 .game-edit-form select {
   width: 100%;

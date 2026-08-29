@@ -150,6 +150,11 @@
           <input name="coverFile" type="file" accept="image/*">
         </span>
       </label>
+      <input name="autoCoverUrl" type="hidden">
+      <div class="auto-cover-row">
+        <button class="button button-secondary" type="button" id="autoCoverButton">自動搜尋圖片</button>
+        <span id="autoCoverStatus">未搜尋圖片</span>
+      </div>
       <footer>
         <button class="button button-secondary" value="cancel" type="button" id="cancelDialogButton">取消</button>
         <button class="button button-primary" value="default" type="submit">建立</button>

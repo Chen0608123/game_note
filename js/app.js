@@ -5,10 +5,12 @@
   escapeHtml,
   formatDate,
   listGames,
+  updateGame,
   uploadGameCover,
 } from "./cloud-store.js";
 import { requireUser, signOut } from "./auth.js";
 import { getGameSortMode } from "./preferences.js";
+import { findGameLogoUrl } from "./game-logo-search.js";
 
 const SIDEBAR_GAME_LIST_KEY = "game-note-sidebar-game-list-expanded";
 
@@ -51,6 +53,8 @@ const elements = {
   dialog: document.querySelector("#gameDialog"),
   form: document.querySelector("#gameForm"),
   coverFileName: document.querySelector("#coverFileName"),
+  autoCoverButton: document.querySelector("#autoCoverButton"),
+  autoCoverStatus: document.querySelector("#autoCoverStatus"),
   totalCount: document.querySelector("#totalCount"),
   playingCount: document.querySelector("#playingCount"),
   memoryCount: document.querySelector("#memoryCount"),
@@ -106,6 +110,43 @@ function setBusy(button, isBusy, label = "處理中") {
 function showError(error) {
   console.error(error);
   alert(`雲端操作失敗：${error.message || error}`);
+}
+
+function setAutoCover(url, message) {
+  if (elements.form?.elements.autoCoverUrl) {
+    elements.form.elements.autoCoverUrl.value = url;
+  }
+
+  if (elements.autoCoverStatus) {
+    elements.autoCoverStatus.textContent = message;
+  }
+}
+
+async function searchAutoCover() {
+  const title = elements.form?.elements.title?.value.trim();
+
+  if (!title) {
+    setAutoCover("", "請先輸入遊戲名稱");
+    return "";
+  }
+
+  setBusy(elements.autoCoverButton, true, "搜尋中");
+  setAutoCover("", "正在搜尋圖片...");
+
+  try {
+    const imageUrl = await findGameLogoUrl(title);
+
+    if (!imageUrl) {
+      setAutoCover("", "找不到圖片，可改用手動上傳");
+      return "";
+    }
+
+    setAutoCover(imageUrl, "已找到圖片，建立後會自動套用");
+    elements.coverFileName.textContent = "已自動找到圖片";
+    return imageUrl;
+  } finally {
+    setBusy(elements.autoCoverButton, false);
+  }
 }
 
 function renderAccount() {
@@ -233,6 +274,15 @@ elements.cancelDialogButton?.addEventListener("click", () => {
   elements.dialog.close();
 });
 
+elements.autoCoverButton?.addEventListener("click", async () => {
+  try {
+    await searchAutoCover();
+  } catch (error) {
+    console.error(error);
+    setAutoCover("", "搜尋失敗，可改用手動上傳");
+  }
+});
+
 elements.loadDemoButton?.addEventListener("click", async (event) => {
   setBusy(event.currentTarget, true, "匯入中");
   try {
@@ -350,9 +400,19 @@ elements.form?.addEventListener("submit", async (event) => {
     const coverFile = formData.get("coverFile");
     if (coverFile instanceof File && coverFile.size) {
       await uploadGameCover(game, coverFile);
+    } else {
+      const autoCoverUrl = formData.get("autoCoverUrl") || await findGameLogoUrl(title);
+
+      if (autoCoverUrl) {
+        await updateGame(game.id, {
+          cover_url: autoCoverUrl,
+          cover_storage_path: "",
+        });
+      }
     }
     elements.form.reset();
     elements.coverFileName.textContent = "請選取檔案";
+    setAutoCover("", "未搜尋圖片");
     elements.dialog.close();
     window.location.href = `./game-detail.html?id=${encodeURIComponent(game.id)}`;
   } catch (error) {
@@ -365,6 +425,9 @@ elements.form?.addEventListener("submit", async (event) => {
 elements.form?.elements.coverFile?.addEventListener("change", (event) => {
   const file = event.target.files?.[0];
   elements.coverFileName.textContent = file ? file.name : "請選取檔案";
+  if (file) {
+    setAutoCover("", "將使用手動選取的圖片");
+  }
 });
 
 elements.logoutButton?.addEventListener("click", async () => {
