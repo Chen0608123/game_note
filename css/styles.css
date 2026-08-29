@@ -1251,6 +1251,13 @@ h2 {
   background: var(--accent) !important;
 }
 
+.pin-action img {
+  display: block;
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+}
+
 .task-item {
   align-items: center;
 }

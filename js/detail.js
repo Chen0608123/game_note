@@ -545,7 +545,7 @@ function render() {
     <article class="list-item">
       <button class="icon-delete-button item-delete-button" type="button" data-delete-note="${escapeHtml(note.id)}" aria-label="刪除筆記"></button>
       <div class="card-actions">
-        <button type="button" class="pin-action ${isPinned("note", note.id) ? "is-pinned" : ""}" data-pin-note="${escapeHtml(note.id)}">${isPinned("note", note.id) ? "已置頂" : "置頂"}</button>
+        <button type="button" class="pin-action ${isPinned("note", note.id) ? "is-pinned" : ""}" data-pin-note="${escapeHtml(note.id)}" aria-label="${isPinned("note", note.id) ? "已置頂" : "置頂"}">${isPinned("note", note.id) ? `<img src="./usepng/Top.png" alt="" aria-hidden="true">` : "置頂"}</button>
       </div>
       <button class="note-preview-button" type="button" data-preview-note="${escapeHtml(note.id)}">
         <span class="note-type-pill">${getNoteTypeLabel(note.note_type)}</span>
@@ -563,7 +563,7 @@ function render() {
     <article class="memory-card">
       <button class="icon-delete-button item-delete-button" type="button" data-delete-memory="${escapeHtml(memory.id)}" aria-label="刪除紀念"></button>
       <div class="card-actions">
-        <button type="button" class="pin-action ${isPinned("memory", memory.id) ? "is-pinned" : ""}" data-pin-memory="${escapeHtml(memory.id)}">${isPinned("memory", memory.id) ? "已置頂" : "置頂"}</button>
+        <button type="button" class="pin-action ${isPinned("memory", memory.id) ? "is-pinned" : ""}" data-pin-memory="${escapeHtml(memory.id)}" aria-label="${isPinned("memory", memory.id) ? "已置頂" : "置頂"}">${isPinned("memory", memory.id) ? `<img src="./usepng/Top.png" alt="" aria-hidden="true">` : "置頂"}</button>
       </div>
       ${renderMedia(memory)}
       <div class="memory-card-content">
