@@ -5,12 +5,10 @@
   escapeHtml,
   formatDate,
   listGames,
-  updateGame,
   uploadGameCover,
 } from "./cloud-store.js";
 import { requireUser, signOut } from "./auth.js";
 import { getGameSortMode } from "./preferences.js";
-import { findGameLogoUrl } from "./game-logo-search.js";
 
 const SIDEBAR_GAME_LIST_KEY = "game-note-sidebar-game-list-expanded";
 
@@ -44,7 +42,6 @@ const state = {
   filter: "全部",
   search: "",
   sidebarGameListExpanded: localStorage.getItem(SIDEBAR_GAME_LIST_KEY) === "true",
-  autoCoverTimer: null,
 };
 
 const elements = {
@@ -54,9 +51,6 @@ const elements = {
   dialog: document.querySelector("#gameDialog"),
   form: document.querySelector("#gameForm"),
   coverFileName: document.querySelector("#coverFileName"),
-  autoCoverButton: document.querySelector("#autoCoverButton"),
-  autoCoverStatus: document.querySelector("#autoCoverStatus"),
-  autoCoverPreview: document.querySelector("#autoCoverPreview"),
   totalCount: document.querySelector("#totalCount"),
   playingCount: document.querySelector("#playingCount"),
   memoryCount: document.querySelector("#memoryCount"),
@@ -112,81 +106,6 @@ function setBusy(button, isBusy, label = "處理中") {
 function showError(error) {
   console.error(error);
   alert(`雲端操作失敗：${error.message || error}`);
-}
-
-function setAutoCover(url, message) {
-  if (elements.form?.elements.autoCoverUrl) {
-    elements.form.elements.autoCoverUrl.value = url;
-  }
-
-  if (elements.autoCoverStatus) {
-    elements.autoCoverStatus.textContent = message;
-  }
-
-  if (elements.autoCoverPreview) {
-    elements.autoCoverPreview.hidden = !url;
-    elements.autoCoverPreview.innerHTML = url ? `<img src="${escapeHtml(url)}" alt="自動搜尋到的遊戲圖片">` : "";
-  }
-}
-
-function clearAutoCoverTimer() {
-  if (state.autoCoverTimer) {
-    clearTimeout(state.autoCoverTimer);
-    state.autoCoverTimer = null;
-  }
-}
-
-async function searchAutoCover({ quiet = false } = {}) {
-  const title = elements.form?.elements.title?.value.trim();
-
-  if (!title) {
-    if (!quiet) {
-      setAutoCover("", "請先輸入遊戲名稱");
-    }
-    return "";
-  }
-
-  const coverFile = elements.form?.elements.coverFile?.files?.[0];
-
-  if (coverFile) {
-    setAutoCover("", "將使用手動選取的圖片");
-    return "";
-  }
-
-  setBusy(elements.autoCoverButton, true, "搜尋中");
-  setAutoCover("", "正在搜尋圖片...");
-
-  try {
-    const currentTitle = title;
-    const imageUrl = await findGameLogoUrl(title);
-
-    if (elements.form?.elements.title?.value.trim() !== currentTitle) {
-      return "";
-    }
-
-    if (!imageUrl) {
-      setAutoCover("", "找不到圖片，可改用手動上傳");
-      return "";
-    }
-
-    setAutoCover(imageUrl, "已找到圖片，建立後會自動套用");
-    elements.coverFileName.textContent = "已自動找到圖片";
-    return imageUrl;
-  } finally {
-    setBusy(elements.autoCoverButton, false);
-  }
-}
-
-function scheduleAutoCoverSearch() {
-  clearAutoCoverTimer();
-  setAutoCover("", "輸入後會自動搜尋圖片");
-
-  state.autoCoverTimer = setTimeout(() => {
-    searchAutoCover({ quiet: true }).catch((error) => {
-      console.error(error);
-      setAutoCover("", "搜尋失敗，可改用手動上傳");
-    });
-  }, 900);
 }
 
 function renderAccount() {
@@ -311,19 +230,7 @@ elements.addButtons.forEach((button) => {
 });
 
 elements.cancelDialogButton?.addEventListener("click", () => {
-  clearAutoCoverTimer();
-  setAutoCover("", "未搜尋圖片");
   elements.dialog.close();
-});
-
-elements.autoCoverButton?.addEventListener("click", async () => {
-  try {
-    clearAutoCoverTimer();
-    await searchAutoCover();
-  } catch (error) {
-    console.error(error);
-    setAutoCover("", "搜尋失敗，可改用手動上傳");
-  }
 });
 
 elements.loadDemoButton?.addEventListener("click", async (event) => {
@@ -443,20 +350,9 @@ elements.form?.addEventListener("submit", async (event) => {
     const coverFile = formData.get("coverFile");
     if (coverFile instanceof File && coverFile.size) {
       await uploadGameCover(game, coverFile);
-    } else {
-      const autoCoverUrl = formData.get("autoCoverUrl").trim() || await findGameLogoUrl(title);
-
-      if (autoCoverUrl) {
-        await updateGame(game.id, {
-          cover_url: autoCoverUrl,
-          cover_storage_path: "",
-        });
-      }
     }
     elements.form.reset();
     elements.coverFileName.textContent = "請選取檔案";
-    clearAutoCoverTimer();
-    setAutoCover("", "未搜尋圖片");
     elements.dialog.close();
     window.location.href = `./game-detail.html?id=${encodeURIComponent(game.id)}`;
   } catch (error) {
@@ -469,15 +365,7 @@ elements.form?.addEventListener("submit", async (event) => {
 elements.form?.elements.coverFile?.addEventListener("change", (event) => {
   const file = event.target.files?.[0];
   elements.coverFileName.textContent = file ? file.name : "請選取檔案";
-  if (file) {
-    clearAutoCoverTimer();
-    setAutoCover("", "將使用手動選取的圖片");
-  } else {
-    scheduleAutoCoverSearch();
-  }
 });
-
-elements.form?.elements.title?.addEventListener("input", scheduleAutoCoverSearch);
 
 elements.logoutButton?.addEventListener("click", async () => {
   try {

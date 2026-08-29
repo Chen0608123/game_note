@@ -737,36 +737,6 @@ h2 {
   white-space: nowrap;
 }
 
-.auto-cover-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  color: var(--muted);
-  font-size: 14px;
-}
-
-.auto-cover-row .button {
-  min-height: 40px;
-  padding: 0 16px;
-}
-
-.auto-cover-preview {
-  display: grid;
-  width: min(220px, 100%);
-  aspect-ratio: 16 / 9;
-  place-items: center;
-  overflow: hidden;
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  background: var(--soft-bg);
-}
-
-.auto-cover-preview img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
 .game-edit-form input,
 .game-edit-form select {
   width: 100%;
