@@ -3,14 +3,14 @@ const WIKIPEDIA_ENDPOINTS = [
   "https://en.wikipedia.org/w/api.php",
 ];
 
-function buildSearchUrl(endpoint, title) {
+function buildSearchUrl(endpoint, searchTerm) {
   const params = new URLSearchParams({
     action: "query",
     format: "json",
     origin: "*",
     generator: "search",
-    gsrsearch: `${title} video game logo`,
-    gsrlimit: "5",
+    gsrsearch: searchTerm,
+    gsrlimit: "8",
     prop: "pageimages",
     pithumbsize: "720",
   });
@@ -31,22 +31,33 @@ export async function findGameLogoUrl(title) {
     return "";
   }
 
+  const searchTerms = [
+    keyword,
+    `${keyword} 遊戲`,
+    `${keyword} game`,
+    `${keyword} video game`,
+    `${keyword} logo`,
+    `${keyword} cover`,
+  ];
+
   for (const endpoint of WIKIPEDIA_ENDPOINTS) {
-    try {
-      const response = await fetch(buildSearchUrl(endpoint, keyword));
+    for (const searchTerm of searchTerms) {
+      try {
+        const response = await fetch(buildSearchUrl(endpoint, searchTerm));
 
-      if (!response.ok) {
-        continue;
+        if (!response.ok) {
+          continue;
+        }
+
+        const result = await response.json();
+        const imageUrl = pickBestImage(result.query?.pages);
+
+        if (imageUrl) {
+          return imageUrl;
+        }
+      } catch (error) {
+        console.warn("自動搜尋遊戲圖片失敗", error);
       }
-
-      const result = await response.json();
-      const imageUrl = pickBestImage(result.query?.pages);
-
-      if (imageUrl) {
-        return imageUrl;
-      }
-    } catch (error) {
-      console.warn("自動搜尋遊戲圖片失敗", error);
     }
   }
 
