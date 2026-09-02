@@ -1,40 +1,104 @@
 const app = document.querySelector('#app');
 const config = window.GAME_NOTE_CONFIG || {};
 const configured = config.supabaseUrl?.startsWith('https://') && config.supabasePublishableKey && !config.supabasePublishableKey.includes('請貼上');
-const db = configured ? window.supabase.createClient(config.supabaseUrl, config.supabasePublishableKey) : null;
+const sdkAvailable = Boolean(window.supabase?.createClient);
+let authQueue = Promise.resolve();
+const localAuthLock = async (_name, _timeout, operation) => {
+  const previous = authQueue;
+  let release;
+  authQueue = new Promise(resolve => { release = resolve; });
+  await previous;
+  try { return await operation(); }
+  finally { release(); }
+};
+const db = configured && sdkAvailable ? window.supabase.createClient(
+  config.supabaseUrl,
+  config.supabasePublishableKey,
+  {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
+      lock: localAuthLock
+    }
+  }
+) : null;
 const state = { user: null, view: 'login', currentGameId: null, tab: 'notes', search: '', games: [], loading: true };
+let startupError = '';
+let loginEmail = '';
 const escapeHtml = (value = '') => String(value).replace(/[&<>'"]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#39;', '"':'&quot;' }[c]));
 const message = text => { document.querySelector('.notice')?.remove(); document.body.insertAdjacentHTML('beforeend', `<div class="notice">${escapeHtml(text)}</div>`); setTimeout(() => document.querySelector('.notice')?.remove(), 3500); };
+const withTimeout = (promise, seconds = 12) => Promise.race([
+  promise,
+  new Promise((_, reject) => setTimeout(() => reject(new Error('連線逾時，請確認 Supabase 專案目前為 Active 狀態。')), seconds * 1000))
+]);
 
 async function start() {
-  if (!configured) { state.loading = false; return renderLogin(); }
-  const { data } = await db.auth.getSession();
-  state.user = data.session?.user || null;
-  if (state.user) { state.view = 'library'; await loadGames(); }
-  state.loading = false; render();
-  db.auth.onAuthStateChange((_event, session) => { state.user = session?.user || null; });
+  render();
+  if (!configured) { startupError = '尚未設定 Supabase，請檢查 config.js。'; state.loading = false; return renderLogin(); }
+  if (!sdkAvailable) { startupError = 'Supabase 程式庫載入失敗，請確認網路連線後重新整理。'; state.loading = false; return renderLogin(); }
+  try {
+    const { data, error } = await db.auth.getSession();
+    if (error) throw error;
+    state.user = data.session?.user || null;
+    if (state.user) { state.view = 'library'; await loadGames(); }
+    db.auth.onAuthStateChange((_event, session) => { state.user = session?.user || null; });
+  } catch (error) {
+    startupError = `Supabase 連線失敗：${error.message || '請檢查專案設定'}`;
+  } finally {
+    state.loading = false; render();
+  }
 }
-function render() { if (state.loading) return app.innerHTML = '<div class="loading">載入中…</div>'; state.view === 'login' ? renderLogin() : state.view === 'library' ? renderLibrary() : renderDetail(); }
+function render() {
+  if (state.loading) return app.innerHTML = '<div class="loading">載入中…</div>';
+  if (state.view === 'login') return renderLogin();
+  if (state.view === 'register') return renderRegister();
+  state.view === 'library' ? renderLibrary() : renderDetail();
+}
 
 function renderLogin() {
-  app.innerHTML = `<section class="login-page"><form class="login-card" id="loginForm"><h1 class="brand">GAME NOTE</h1><p class="tagline">收藏每一段遊戲旅程</p>${configured ? '' : '<p class="setup-warning">尚未設定 Supabase，請先依照 README.md 填寫 config.js。</p>'}<div class="field"><label for="email">電子信箱</label><input id="email" type="email" placeholder="name@gmail.com" required></div><div class="field"><label for="password">密碼</label><input id="password" type="password" placeholder="至少 6 個字元" required minlength="6"></div><button class="primary" type="submit" ${configured ? '' : 'disabled'}>登入</button><button class="text-button" id="signup" type="button" ${configured ? '' : 'disabled'}>第一次使用？建立帳號</button></form></section>`;
+  app.innerHTML = `<section class="login-page"><form class="login-card" id="loginForm"><h1 class="brand">GAME NOTE</h1><p class="tagline">收藏每一段遊戲旅程</p>${startupError ? `<p class="setup-warning">${escapeHtml(startupError)}</p>` : ''}<div class="field"><label for="email">電子信箱</label><input id="email" type="email" value="${escapeHtml(loginEmail)}" placeholder="name@gmail.com" autocomplete="email" required></div><div class="field"><label for="password">密碼</label><input id="password" type="password" placeholder="至少 6 個字元" autocomplete="current-password" required minlength="6"></div><button class="primary" type="submit" ${db ? '' : 'disabled'}>登入</button><button class="text-button" id="signup" type="button" ${db ? '' : 'disabled'}>第一次使用？建立帳號</button></form></section>`;
   document.querySelector('#loginForm').onsubmit = login;
-  document.querySelector('#signup').onclick = signup;
+  document.querySelector('#signup').onclick = () => { state.view = 'register'; startupError = ''; render(); };
+}
+function renderRegister() {
+  app.innerHTML = `<section class="login-page"><form class="login-card" id="registerForm"><h1 class="brand small-brand">建立帳號</h1><p class="tagline">開始收藏你的遊戲旅程</p><div class="field"><label for="registerEmail">電子信箱</label><input id="registerEmail" type="email" placeholder="name@gmail.com" autocomplete="email" required></div><div class="field"><label for="registerPassword">密碼</label><input id="registerPassword" type="password" placeholder="至少 6 個字元" autocomplete="new-password" minlength="6" required></div><div class="field"><label for="confirmPassword">確認密碼</label><input id="confirmPassword" type="password" placeholder="再次輸入密碼" autocomplete="new-password" minlength="6" required></div><button class="primary" type="submit">註冊</button><button class="text-button" id="backLogin" type="button">← 返回登入</button></form></section>`;
+  document.querySelector('#registerForm').onsubmit = signup;
+  document.querySelector('#backLogin').onclick = () => { state.view = 'login'; render(); };
 }
 function credentials() { return { email: document.querySelector('#email')?.value.trim(), password: document.querySelector('#password')?.value || '' }; }
 function setFormBusy(busy) { document.querySelectorAll('#loginForm button').forEach(x => x.disabled = busy); }
 async function login(e) {
   e.preventDefault(); setFormBusy(true);
-  const { error } = await db.auth.signInWithPassword(credentials());
-  if (error) { setFormBusy(false); return message(`登入失敗：${error.message}`); }
-  state.user = (await db.auth.getUser()).data.user; state.view = 'library'; await loadGames(); render();
+  try {
+    const { error } = await withTimeout(db.auth.signInWithPassword(credentials()));
+    if (error) throw error;
+    state.user = (await db.auth.getUser()).data.user; state.view = 'library'; await loadGames(); render();
+  } catch (error) {
+    setFormBusy(false); message(`登入失敗：${error.message}`);
+  }
 }
-async function signup() {
-  const values = credentials();
-  if (!values.email || values.password.length < 6) return message('請輸入有效信箱與至少 6 個字元的密碼。');
-  setFormBusy(true); const { data, error } = await db.auth.signUp(values); setFormBusy(false);
-  if (error) return message(`註冊失敗：${error.message}`);
-  message(data.session ? '帳號建立完成！' : '帳號已建立，請到信箱完成驗證後登入。');
+async function signup(e) {
+  e.preventDefault();
+  const email = document.querySelector('#registerEmail').value.trim();
+  const password = document.querySelector('#registerPassword').value;
+  const confirmPassword = document.querySelector('#confirmPassword').value;
+  if (password !== confirmPassword) return message('兩次輸入的密碼不一致。');
+  if (password.length < 6) return message('密碼至少需要 6 個字元。');
+  document.querySelectorAll('#registerForm button').forEach(x => x.disabled = true);
+  try {
+    const { data, error } = await withTimeout(db.auth.signUp({ email, password }));
+    if (error) throw error;
+    if (data.session) await withTimeout(db.auth.signOut());
+    loginEmail = email;
+    state.user = null;
+    state.view = 'login';
+    render();
+    message(data.session ? '帳號建立完成，請使用新帳號登入。' : '帳號建立完成，請先到信箱完成驗證後登入。');
+  } catch (error) {
+    message(`註冊失敗：${error.message}`);
+    document.querySelectorAll('#registerForm button').forEach(x => x.disabled = false);
+  }
 }
 
 async function loadGames() {
@@ -56,7 +120,7 @@ function gameCard(g) { const cover = g.cover_url ? `<img src="${escapeHtml(g.cov
 function renderDetail() {
   const game = state.games.find(g => g.id === state.currentGameId); if (!game) { state.view = 'library'; return render(); }
   const list = state.tab === 'notes' ? game.notes : game.memories, label = state.tab === 'notes' ? '筆記' : '紀念';
-  app.innerHTML = `<section class="detail-page"><header class="detail-header"><button class="back" id="back">← 回到首頁</button><h1 class="detail-title">GAME NOTE</h1><span class="detail-game">${escapeHtml(game.name)}</span></header><nav class="tabs"><button class="tab ${state.tab === 'notes' ? 'active' : ''}" data-tab="notes">筆記</button><button class="tab ${state.tab === 'memories' ? 'active' : ''}" data-tab="memories">紀念</button></nav><div class="section-head"><h2>${label}收藏</h2><button class="primary" id="addEntry">＋ 新增${label}</button></div><div class="entries">${list.length ? list.map(entryCard).join('') : `<div class="empty">目前還沒有${label}</div>`}</div></section>`;
+  app.innerHTML = `<section class="detail-page"><header class="detail-header"><button class="back" id="back">← 回到首頁</button><h1 class="detail-title">${escapeHtml(game.name)} 的 NOTE</h1><span class="detail-game">${escapeHtml(game.name)}</span></header><nav class="tabs"><button class="tab ${state.tab === 'notes' ? 'active' : ''}" data-tab="notes">筆記</button><button class="tab ${state.tab === 'memories' ? 'active' : ''}" data-tab="memories">紀念</button></nav><div class="section-head"><h2>${label}收藏</h2><button class="primary" id="addEntry">＋ 新增${label}</button></div><div class="entries">${list.length ? list.map(entryCard).join('') : `<div class="empty">目前還沒有${label}</div>`}</div></section>`;
   document.querySelector('#back').onclick = () => { state.view = 'library'; render(); };
   document.querySelectorAll('[data-tab]').forEach(el => el.onclick = () => { state.tab = el.dataset.tab; render(); });
   document.querySelector('#addEntry').onclick = () => openEntryModal(game);
@@ -72,7 +136,11 @@ function openGameModal() {
     e.preventDefault(); e.submitter.disabled = true; let coverUrl = null;
     if (input.files[0]) { try { coverUrl = await uploadCover(input.files[0]); } catch (error) { e.submitter.disabled = false; return message(`圖片上傳失敗：${error.message}`); } }
     const { error } = await db.from('games').insert({ user_id: state.user.id, name: document.querySelector('#gameName').value.trim(), cover_url: coverUrl });
-    if (error) { e.submitter.disabled = false; return message(`新增失敗：${error.message}`); }
+    if (error) {
+      e.submitter.disabled = false;
+      const schemaError = /schema cache|column of ['"]?games/i.test(error.message);
+      return message(schemaError ? '資料庫欄位尚未建立，請在 Supabase 執行 repair_schema.sql。' : `新增失敗：${error.message}`);
+    }
     closeModal(); await loadGames(); renderLibrary();
   };
 }
