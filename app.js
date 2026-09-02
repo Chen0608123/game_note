@@ -126,7 +126,13 @@ function renderDetail() {
   document.querySelector('#addEntry').onclick = () => openEntryModal(game);
   document.querySelectorAll('[data-delete]').forEach(el => el.onclick = () => deleteEntry(el.dataset.delete));
 }
-function entryCard(item) { return `<article class="entry"><button class="delete" data-delete="${item.id}" aria-label="刪除">✕</button><h3>${escapeHtml(item.title)}</h3><p>${escapeHtml(item.content)}</p>${item.link_url ? `<a href="${escapeHtml(item.link_url)}" target="_blank" rel="noreferrer">開啟連結</a>` : ''}</article>`; }
+function entryCard(item) {
+  let media = '';
+  if (item.entry_type === '圖片' && item.media_url) media = `<img class="entry-media" src="${escapeHtml(item.media_url)}" alt="${escapeHtml(item.title)}">`;
+  if (item.entry_type === '影片' && item.media_url) media = `<video class="entry-media" src="${escapeHtml(item.media_url)}" controls preload="metadata"></video>`;
+  const link = item.link_url ? `<a class="entry-link" href="${escapeHtml(item.link_url)}" target="_blank" rel="noreferrer">開啟${item.entry_type === '影片' ? '影片' : '連結'} ↗</a>` : '';
+  return `<article class="entry"><button class="delete" data-delete="${item.id}" aria-label="刪除">✕</button>${media}<h3>${escapeHtml(item.title)}</h3><p>${escapeHtml(item.content)}</p>${link}</article>`;
+}
 async function deleteEntry(id) { const { error } = await db.from('entries').delete().eq('id', id); if (error) return message(`刪除失敗：${error.message}`); await loadGames(); render(); }
 
 function openGameModal() {
@@ -152,14 +158,42 @@ async function uploadCover(file) {
 }
 function openEntryModal(game) {
   const isNote = state.tab === 'notes';
-  showModal(`<h2>新增${isNote ? '筆記' : '紀念'}</h2><form id="entryForm"><div class="type-tabs">${(isNote ? ['文字','圖片','影片'] : ['圖片','影片','連結']).map((x,i) => `<button type="button" class="${i===0?'active':''}" data-type="${x}">${x}</button>`).join('')}</div><div class="field"><label for="entryTitle">${isNote ? '筆記標題' : '紀念文字'}</label><input id="entryTitle" required></div><div class="field"><label for="entryContent">${isNote ? '筆記內容' : '介紹文字'}</label><textarea id="entryContent" rows="6" required></textarea></div>${isNote ? '' : '<div class="field"><label for="entryLink">連結（選填）</label><input id="entryLink" type="url" placeholder="https://"></div>'}<div class="actions"><button class="secondary" data-close type="button">取消</button><button class="primary" type="submit">完成</button></div></form>`);
-  let entryType = isNote ? '文字' : '圖片'; document.querySelectorAll('[data-type]').forEach(el => el.onclick = () => { entryType = el.dataset.type; document.querySelectorAll('[data-type]').forEach(x => x.classList.remove('active')); el.classList.add('active'); });
+  showModal(`<h2>新增${isNote ? '筆記' : '紀念'}</h2><form id="entryForm"><div class="type-tabs">${(isNote ? ['文字','圖片','影片'] : ['圖片','影片','連結']).map((x,i) => `<button type="button" class="${i===0?'active':''}" data-type="${x}">${x}</button>`).join('')}</div><div class="field"><label for="entryTitle">${isNote ? '筆記標題' : '紀念文字'}</label><input id="entryTitle" required></div><div class="field"><label for="entryContent">${isNote ? '筆記內容' : '介紹文字'}</label><textarea id="entryContent" rows="6" required></textarea></div><div id="mediaFields"></div><div class="actions"><button class="secondary" data-close type="button">取消</button><button class="primary" type="submit">完成</button></div></form>`);
+  let entryType = isNote ? '文字' : '圖片';
+  const renderMediaFields = () => {
+    const box = document.querySelector('#mediaFields');
+    if (entryType === '圖片') box.innerHTML = '<div class="field"><label for="entryFile">選擇圖片檔案</label><input id="entryFile" type="file" accept="image/*" required><small>圖片上限 10 MB</small></div>';
+    else if (entryType === '影片') box.innerHTML = '<div class="field"><label for="entryFile">選擇影片檔案（與連結擇一）</label><input id="entryFile" type="file" accept="video/*"><small>影片上限 50 MB</small></div><div class="field"><label for="entryLink">影片連結（與檔案擇一）</label><input id="entryLink" type="url" placeholder="https://"></div>';
+    else if (entryType === '連結') box.innerHTML = '<div class="field"><label for="entryLink">紀念連結</label><input id="entryLink" type="url" placeholder="https://" required></div>';
+    else box.innerHTML = '';
+  };
+  renderMediaFields();
+  document.querySelectorAll('[data-type]').forEach(el => el.onclick = () => { entryType = el.dataset.type; document.querySelectorAll('[data-type]').forEach(x => x.classList.remove('active')); el.classList.add('active'); renderMediaFields(); });
   document.querySelector('#entryForm').onsubmit = async e => {
     e.preventDefault(); e.submitter.disabled = true;
-    const row = { game_id: game.id, user_id: state.user.id, kind: isNote ? 'note' : 'memory', entry_type: entryType, title: document.querySelector('#entryTitle').value.trim(), content: document.querySelector('#entryContent').value.trim(), link_url: document.querySelector('#entryLink')?.value.trim() || null };
+    const file = document.querySelector('#entryFile')?.files[0] || null;
+    const linkUrl = document.querySelector('#entryLink')?.value.trim() || null;
+    if (entryType === '影片' && !file && !linkUrl) { e.submitter.disabled = false; return message('請選擇影片檔案或輸入影片連結。'); }
+    let mediaUrl = null;
+    if (file) {
+      try { mediaUrl = await uploadEntryMedia(file, entryType); }
+      catch (error) { e.submitter.disabled = false; return message(`檔案上傳失敗：${error.message}`); }
+    }
+    const row = { game_id: game.id, user_id: state.user.id, kind: isNote ? 'note' : 'memory', entry_type: entryType, title: document.querySelector('#entryTitle').value.trim(), content: document.querySelector('#entryContent').value.trim(), link_url: linkUrl, media_url: mediaUrl };
     const { error } = await db.from('entries').insert(row); if (error) { e.submitter.disabled = false; return message(`新增失敗：${error.message}`); }
     closeModal(); await loadGames(); render();
   };
+}
+async function uploadEntryMedia(file, type) {
+  const maxSize = type === '影片' ? 50 * 1024 * 1024 : 10 * 1024 * 1024;
+  if (file.size > maxSize) throw new Error(`${type}不可超過 ${type === '影片' ? '50' : '10'} MB`);
+  if (type === '圖片' && !file.type.startsWith('image/')) throw new Error('請選擇圖片檔案');
+  if (type === '影片' && !file.type.startsWith('video/')) throw new Error('請選擇影片檔案');
+  const ext = (file.name.split('.').pop() || 'bin').replace(/[^a-z0-9]/gi, '');
+  const path = `${state.user.id}/${crypto.randomUUID()}.${ext}`;
+  const { error } = await db.storage.from('entry-media').upload(path, file, { cacheControl: '3600', contentType: file.type });
+  if (error) throw error;
+  return db.storage.from('entry-media').getPublicUrl(path).data.publicUrl;
 }
 function showModal(content) { document.body.insertAdjacentHTML('beforeend', `<div class="modal-wrap" id="modal"><div class="modal">${content}</div></div>`); document.querySelectorAll('[data-close]').forEach(el => el.onclick = closeModal); document.querySelector('#modal').onclick = e => { if (e.target.id === 'modal') closeModal(); }; }
 function closeModal() { document.querySelector('#modal')?.remove(); }
